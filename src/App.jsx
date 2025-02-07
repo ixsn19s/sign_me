@@ -8,9 +8,8 @@ const App = () => {
   const [strokeColor, setStrokeColor] = useState("#6556cd");
   const [canvasColor, setCanvasColor] = useState("#DEDEDE");
   const [eraserWidth, setEraserWidth] = useState(6);
-  const [menuOpen, setMenuOpen] = useState(false); // Menu toggle state
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Handle actions
   const handleUndo = () => {
     canvasRef?.current?.undo();
   };
@@ -27,6 +26,7 @@ const App = () => {
     canvasRef?.current.resetCanvas();
   };
 
+  //sign image download garni
   const handleExport = async (format) => {
     try {
       const data = await canvasRef?.current.exportImage(format);
@@ -69,15 +69,14 @@ const App = () => {
 
   return (
     <div className="flex flex-col justify-center items-center py-4 px-4 min-h-screen bg-gray-100 relative">
-      {/* Canvas */}
       <ReactSketchCanvas
         style={{
           border: "2px solid gray",
           borderRadius: "0.2rem",
           width: "100%",
-          maxWidth: "800px", // Limit max width for larger screens
+          maxWidth: "800px", //large
           height: "70vh",
-          marginBottom: "2rem", // Add gap between canvas and controls
+          marginBottom: "2rem",
         }}
         ref={canvasRef}
         strokeColor={eraserMode ? canvasColor : strokeColor}
@@ -87,21 +86,18 @@ const App = () => {
         withErase={eraserMode}
       />
 
-      {/* Hamburger Menu Button (Visible on small screens) */}
       <button
         onClick={toggleMenu}
         className="lg:hidden absolute top-4 right-4 text-3xl p-2 z-10 bg-white rounded-full shadow-md"
       >
-        {menuOpen ? "×" : "☰"} {/* Hamburger or Close Icon */}
+        {menuOpen ? "×" : "☰"}
       </button>
 
-      {/* Menu (Visible when menuOpen is true) */}
       <div
         className={`${
           menuOpen ? "flex" : "hidden"
         } flex-col items-center gap-4 absolute bottom-10 left-0 w-full px-6 bg-white shadow-md rounded-md lg:flex lg:flex-row lg:static lg:bg-transparent lg:shadow-none lg:justify-center`}
       >
-        {/* Action Buttons */}
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-400 w-full sm:w-auto"
           onClick={handleUndo}
@@ -139,7 +135,6 @@ const App = () => {
           Export JPG
         </button>
 
-        {/* Stroke Color and Width Controls */}
         <div className="flex gap-3 items-center w-full sm:w-auto">
           <label className="text-gray-700">Stroke Color:</label>
           <input
@@ -161,7 +156,6 @@ const App = () => {
           />
         </div>
 
-        {/* Canvas Color and Eraser Width Controls */}
         <div className="flex gap-3 items-center w-full sm:w-auto">
           <label className="text-gray-700">Canvas Color:</label>
           <input
@@ -183,7 +177,6 @@ const App = () => {
           />
         </div>
 
-        {/* Eraser Mode Toggle */}
         <button
           className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-400 w-full sm:w-auto"
           onClick={toggleEraserButton}
