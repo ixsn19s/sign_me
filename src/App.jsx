@@ -1,143 +1,192 @@
-
-import React from "react";
-import { useState } from "react";
-import { useRef } from "react";
+import React, { useState, useRef } from "react";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
 const App = () => {
   const canvasRef = useRef();
-  const [eraserMode, seteraserMode] = useState(false);
-  const [strokeWidth, setstrokeWidth] = useState(6);
-  const [strokeColor, setstrokeColor] = useState("#6556cd");
+  const [eraserMode, setEraserMode] = useState(false);
+  const [strokeWidth, setStrokeWidth] = useState(6);
+  const [strokeColor, setStrokeColor] = useState("#6556cd");
   const [canvasColor, setCanvasColor] = useState("#DEDEDE");
+  const [eraserWidth, setEraserWidth] = useState(6);
+  const [menuOpen, setMenuOpen] = useState(false); // Menu toggle state
 
-  function handleUndo() {
+  // Handle actions
+  const handleUndo = () => {
     canvasRef?.current?.undo();
-  }
-  function handleRedo() {
+  };
+
+  const handleRedo = () => {
     canvasRef?.current?.redo();
-  }
+  };
 
-  function clearCanvas() {
+  const clearCanvas = () => {
     canvasRef?.current.clearCanvas();
-  }
+  };
 
-  function resetCanvas() {
+  const resetCanvas = () => {
     canvasRef?.current.resetCanvas();
-  }
+  };
 
-const handleExport = async (format) => {
-  const data = await canvasRef?.current.exportImage(format);
-  console.log(data);
+  const handleExport = async (format) => {
+    try {
+      const data = await canvasRef?.current.exportImage(format);
+      const link = document.createElement("a");
+      link.href = data;
+      link.download = `canvas.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error exporting image:", error);
+    }
+  };
 
-  // Create a download link
-  const link = document.createElement("a");
-  link.href = data;
-  link.download = `canvas.${format}`; // Set the filename
-  document.body.appendChild(link);
-  link.click(); // Trigger the download
-  document.body.removeChild(link); // Clean up
-};
-  function toggleEraserButon() {
-    seteraserMode(!eraserMode);
-  }
+  const toggleEraserButton = () => {
+    setEraserMode(!eraserMode);
+  };
 
   const handleStrokeColor = (e) => {
-    setstrokeColor(e.target.value);
+    setStrokeColor(e.target.value);
   };
-  const handleStrokeWidth = (e) => {
-    setstrokeWidth(e.target.value, 6);
 
-    // setstrokeWidth(e.target.value)
+  const handleStrokeWidth = (e) => {
+    setStrokeWidth(Number(e.target.value));
   };
+
   const handleCanvasColor = (e) => {
     setCanvasColor(e.target.value);
-     resetCanvas();
+    resetCanvas();
   };
 
-  // stroke color, stroke width, canvas color change
+  const handleEraserWidth = (e) => {
+    setEraserWidth(Number(e.target.value));
+  };
+
+  // Toggle the hamburger menu
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
   return (
-    <div className=" flex relative flex-col justify-center items-center py-20 ">
+    <div className="flex flex-col justify-center items-center py-4 px-4 min-h-screen bg-gray-100 relative">
+      {/* Canvas */}
       <ReactSketchCanvas
         style={{
           border: "2px solid gray",
           borderRadius: "0.2rem",
+          width: "100%",
+          maxWidth: "800px", // Limit max width for larger screens
+          height: "70vh",
+          marginBottom: "2rem", // Add gap between canvas and controls
         }}
         ref={canvasRef}
-        width="80vw"
-        height="70vh"
         strokeColor={eraserMode ? canvasColor : strokeColor}
         strokeWidth={strokeWidth}
         canvasColor={canvasColor}
-        eraserWidth={6}
+        eraserWidth={eraserWidth}
         withErase={eraserMode}
       />
-      <div className="flex absolute left-40 bottom-10 gap-5 ">
+
+      {/* Hamburger Menu Button (Visible on small screens) */}
+      <button
+        onClick={toggleMenu}
+        className="lg:hidden absolute top-4 right-4 text-3xl p-2 z-10 bg-white rounded-full shadow-md"
+      >
+        {menuOpen ? "×" : "☰"} {/* Hamburger or Close Icon */}
+      </button>
+
+      {/* Menu (Visible when menuOpen is true) */}
+      <div
+        className={`${
+          menuOpen ? "flex" : "hidden"
+        } flex-col items-center gap-4 absolute bottom-10 left-0 w-full px-6 bg-white shadow-md rounded-md lg:flex lg:flex-row lg:static lg:bg-transparent lg:shadow-none lg:justify-center`}
+      >
+        {/* Action Buttons */}
         <button
-          className=" border border-zinc-700 px-3 py-1 rounded-md text-zinc-600 text-[17px]"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-400 w-full sm:w-auto"
           onClick={handleUndo}
         >
           Undo
         </button>
         <button
-          className=" border border-zinc-700 px-3 py-1 rounded-md text-zinc-600 text-[17px]"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-400 w-full sm:w-auto"
           onClick={handleRedo}
         >
           Redo
         </button>
         <button
-          className=" border border-zinc-700 px-3 py-1 rounded-md text-zinc-600 text-[17px]"
+          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-400 w-full sm:w-auto"
           onClick={clearCanvas}
         >
           Clear
         </button>
         <button
-          className=" border border-zinc-700 px-3 py-1 rounded-md text-zinc-600 text-[17px]"
+          className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-400 w-full sm:w-auto"
           onClick={resetCanvas}
         >
           Reset
         </button>
         <button
-          className=" border border-zinc-700 px-3 py-1 rounded-md text-zinc-600 text-[17px]"
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-400 w-full sm:w-auto"
           onClick={() => handleExport("png")}
         >
-          Export
+          Export PNG
         </button>
         <button
-          className=" border border-zinc-700 px-3 py-1 rounded-md text-zinc-600 text-[17px]"
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-400 w-full sm:w-auto"
           onClick={() => handleExport("jpeg")}
         >
-          Export
+          Export JPG
         </button>
 
-        <input
-          type="color"
-          value={strokeColor}
-          onChange={handleStrokeColor}
-          className="border border-zinc-700 rounded-md"
-        />
+        {/* Stroke Color and Width Controls */}
+        <div className="flex gap-3 items-center w-full sm:w-auto">
+          <label className="text-gray-700">Stroke Color:</label>
+          <input
+            type="color"
+            value={strokeColor}
+            onChange={handleStrokeColor}
+            className="border rounded-md cursor-pointer"
+          />
+        </div>
+        <div className="flex gap-3 items-center w-full sm:w-auto">
+          <label className="text-gray-700">Stroke Width:</label>
+          <input
+            type="number"
+            min="1"
+            max="50"
+            value={strokeWidth}
+            onChange={handleStrokeWidth}
+            className="border rounded-md w-16 text-center"
+          />
+        </div>
 
-        <input
-          type="number"
-          min="1"
-          max="50"
-          value={strokeWidth}
-          onChange={handleStrokeWidth}
-          className="border border-zinc-700 rounded-md"
-        />
+        {/* Canvas Color and Eraser Width Controls */}
+        <div className="flex gap-3 items-center w-full sm:w-auto">
+          <label className="text-gray-700">Canvas Color:</label>
+          <input
+            type="color"
+            value={canvasColor}
+            onChange={handleCanvasColor}
+            className="border rounded-md cursor-pointer"
+          />
+        </div>
+        <div className="flex gap-3 items-center w-full sm:w-auto">
+          <label className="text-gray-700">Eraser Width:</label>
+          <input
+            type="number"
+            min="1"
+            max="50"
+            value={eraserWidth}
+            onChange={handleEraserWidth}
+            className="border rounded-md w-16 text-center"
+          />
+        </div>
 
-        <input
-          type="color"
-          value={canvasColor}
-          onChange={handleCanvasColor}
-          className="border border-zinc-700 rounded-md"
-        />
-        {/* stroke color, stroke width, canvas color */}
-
+        {/* Eraser Mode Toggle */}
         <button
-          className=" border border-zinc-700 px-3 py-1 rounded-md text-zinc-600 text-[17px]"
-          onClick={toggleEraserButon}
+          className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-400 w-full sm:w-auto"
+          onClick={toggleEraserButton}
         >
           {eraserMode ? "Draw" : "Eraser"}
         </button>
@@ -147,160 +196,3 @@ const handleExport = async (format) => {
 };
 
 export default App;
-
-
-
-
-
-// import React, { useRef, useState, useEffect } from "react";
-
-// const DrawingApp = () => {
-//   const canvasRef = useRef(null);
-//   const [isDrawing, setIsDrawing] = useState(false);
-//   const [ctx, setCtx] = useState(null);
-//   const [color, setColor] = useState("black");
-//   const [brushSize, setBrushSize] = useState(2);
-//   const [paths, setPaths] = useState([]);
-//   const [currentPath, setCurrentPath] = useState([]);
-//   const [redoStack, setRedoStack] = useState([]);
-
-//   useEffect(() => {
-//     const canvas = canvasRef.current;
-//     const context = canvas.getContext("2d");
-//     context.lineCap = "round";
-//     setCtx(context);
-//   }, []);
-
-//   const startDrawing = (e) => {
-//     setIsDrawing(true);
-//     const { offsetX, offsetY } = e.nativeEvent;
-//     const newPath = [{ x: offsetX, y: offsetY, color, size: brushSize }];
-//     setCurrentPath(newPath);
-//   };
-
-//   const draw = (e) => {
-//     if (!isDrawing) return;
-
-//     const { offsetX, offsetY } = e.nativeEvent;
-//     const point = { x: offsetX, y: offsetY, color, size: brushSize };
-
-//     // Add point to current path
-//     setCurrentPath((prev) => [...prev, point]);
-
-//     // Draw on canvas
-//     ctx.strokeStyle = color;
-//     ctx.lineWidth = brushSize;
-//     ctx.lineTo(offsetX, offsetY);
-//     ctx.stroke();
-//   };
-
-//   const stopDrawing = () => {
-//     setIsDrawing(false);
-//     ctx.closePath();
-//     if (currentPath.length > 0) {
-//       setPaths((prevPaths) => [...prevPaths, currentPath]);
-//       setCurrentPath([]);
-//       setRedoStack([]);
-//     }
-//   };
-
-//   const clearCanvas = () => {
-//     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-//     setPaths([]);
-//     setRedoStack([]);
-//   };
-
-//   const undo = () => {
-//     if (paths.length === 0) return;
-//     const newPaths = [...paths];
-//     const lastPath = newPaths.pop();
-//     setPaths(newPaths);
-//     setRedoStack((prev) => [lastPath, ...prev]);
-//     redrawCanvas(newPaths);
-//   };
-
-//   const redo = () => {
-//     if (redoStack.length === 0) return;
-//     const newRedoStack = [...redoStack];
-//     const pathToRestore = newRedoStack.shift();
-//     setRedoStack(newRedoStack);
-//     setPaths((prevPaths) => [...prevPaths, pathToRestore]);
-//     redrawCanvas([...paths, pathToRestore]);
-//   };
-
-//   const redrawCanvas = (pathsToDraw) => {
-//     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-//     pathsToDraw.forEach((path) => {
-//       ctx.beginPath();
-//       path.forEach((point, index) => {
-//         ctx.strokeStyle = point.color;
-//         ctx.lineWidth = point.size;
-//         if (index === 0) {
-//           ctx.moveTo(point.x, point.y);
-//         } else {
-//           ctx.lineTo(point.x, point.y);
-//           ctx.stroke();
-//         }
-//       });
-//       ctx.closePath();
-//     });
-//   };
-
-//   const saveCanvas = () => {
-//     const canvas = canvasRef.current;
-//     const dataURL = canvas.toDataURL("image/png");
-//     const link = document.createElement("a");
-//     link.href = dataURL;
-//     link.download = "drawing.png";
-//     link.click();
-//   };
-
-//   return (
-//     <div style={{ textAlign: "center", marginTop: "20px" }}>
-//       <h1>React Drawing App</h1>
-//       <canvas
-//         ref={canvasRef}
-//         width={500}
-//         height={400}
-//         style={{
-//           border: "2px solid black",
-//           cursor: "crosshair",
-//         }}
-//         onMouseDown={startDrawing}
-//         onMouseMove={draw}
-//         onMouseUp={stopDrawing}
-//         onMouseLeave={stopDrawing}
-//       />
-//       <div style={{ marginTop: "10px" }}>
-//         <label>
-//           Brush Color:
-//           <input
-//             type="color"
-//             value={color}
-//             onChange={(e) => setColor(e.target.value)}
-//             style={{ marginLeft: "10px" }}
-//           />
-//         </label>
-//         <label style={{ marginLeft: "20px" }}>
-//           Brush Size:
-//           <input
-//             type="number"
-//             value={brushSize}
-//             onChange={(e) => setBrushSize(e.target.value)}
-//             min="1"
-//             max="20"
-//             style={{ width: "50px", marginLeft: "10px" }}
-//           />
-//         </label>
-//       </div>
-//       <div style={{ marginTop: "10px" }}>
-//         <button onClick={clearCanvas}>Clear</button>
-//         <button onClick={saveCanvas}>Save</button>
-//         <button onClick={undo}>Undo</button>
-//         <button onClick={redo}>Redo</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default DrawingApp;

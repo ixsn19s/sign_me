@@ -33,10 +33,110 @@
   }
 }
 
-.card {
-  padding: 2em;
+/* General Styles */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
 }
 
-.read-the-docs {
-  color: #888;
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Canvas Container */
+.canvas-container {
+  width: 90%;
+  max-width: 1200px;
+  height: 70vh;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Buttons */
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #6556cd;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button:hover {
+  background-color: #5243aa;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Inputs */
+input[type="color"] {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+}
+
+input[type="range"] {
+  width: 100px;
+  cursor: pointer;
+}
+
+/* Icons */
+button svg {
+  font-size: 18px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .canvas-container {
+    height: 50vh;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .toolbar-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
